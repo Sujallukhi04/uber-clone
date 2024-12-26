@@ -11,6 +11,12 @@ const register = async (req, res) => {
   const { fullname, email, password } = req.body;
 
   try {
+    const emailExist = await User.findOne({ email });
+
+    if (emailExist)
+      res.status(401).json({
+        message: "User alreadt exists",
+      });
     const hashpassword = await User.hashPassword(password);
 
     const user = await createUser({
