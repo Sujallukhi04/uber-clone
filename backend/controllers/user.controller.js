@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import { validationResult } from "express-validator";
 import { createUser } from "../services/user.service.js";
+import BlackListToken from "../models/blackList.js";
 const register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -38,7 +39,7 @@ const login = async (req, res) => {
 
   const { email, password } = req.body;
   try {
-    const isUser = await User.findOne({ email });
+    const isUser = await User.findOne({ email }).select("+password");
 
     if (!isUser)
       res.status(401).json({ message: "Inavalid email or password" });
@@ -49,6 +50,8 @@ const login = async (req, res) => {
 
     const token = isUser.generateAuthToken();
 
+    res.cookie("token", token);
+
     res.status(200).json({ token, user: isUser });
   } catch (error) {
     return res.status(500).json({
@@ -58,4 +61,17 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login };
+const getUserProflie = async (req, res) => {
+  res.status(200).json({ user: req.user });
+};
+const logout = async (req, res) => {
+  res.clearCookie("token");
+  const token = req.cookies.token;
+
+  const blacklist = await BlackListToken.create({
+    token,
+  });
+
+  res.status(200).json({ message: "logout successfully" });
+};
+export { register, login, getUserProflie, logout };
