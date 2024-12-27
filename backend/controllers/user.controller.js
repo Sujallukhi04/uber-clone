@@ -71,12 +71,12 @@ const getUserProflie = async (req, res) => {
   res.status(200).json({ user: req.user });
 };
 const logout = async (req, res) => {
-  res.clearCookie("token");
   const token = req.cookies.token;
 
   const blacklist = await BlackListToken.create({
     token,
   });
+  res.clearCookie("token");
 
   res.status(200).json({ message: "logout successfully" });
 };
