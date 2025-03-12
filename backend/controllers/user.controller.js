@@ -28,7 +28,9 @@ const register = async (req, res) => {
 
     const token = user.generateAuthToken();
 
-    res.status(200).json({ token, user });
+    res.cookie("token", token);
+
+    res.status(201).json({ token, user });
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",

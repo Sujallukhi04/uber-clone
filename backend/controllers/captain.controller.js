@@ -32,6 +32,8 @@ const register = async (req, res) => {
 
     const token = captain.generateAuthToken();
 
+    res.cookie("token", token);
+
     res.status(201).json({ token, captain });
   } catch (error) {
     return res.status(500).json({
@@ -80,7 +82,7 @@ const logout = async (req, res) => {
   const token = req.cookies.token;
 
   await BlackListToken.create({ token });
-  
+
   res.clearCookie("token");
 
   res.status(200).json({
